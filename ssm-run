@@ -5,17 +5,17 @@ shift
 INSTANCE_IDS=$@
 PARAMS='{"commands":["'$CMD'"],"executionTimeout":["600"]}'
 
-REGION='eu-west-1'
-PROFILE='PROFILE_NAME'
+REGION=eu-west-1
+PROFILE=YOUR_PROFILE
 
 # Check that the agent is installed and running
 for instance in $INSTANCE_IDS; do
     STATUS=$( aws ssm describe-instance-information \
         --instance-information-filter-list key=InstanceIds,valueSet=$instance \
         --query 'InstanceInformationList[].{id:InstanceId,status:PingStatus}' \
-        --output text 2>&1
-        --region $REGION
-        --profile $PROFILE )
+        --region $REGION \
+        --profile $PROFILE \
+        --output text 2>&1 )
 
     if [ $? -ne 0 ]; then
         echo $STATUS
@@ -41,9 +41,9 @@ ID=$( aws ssm send-command \
     --parameters "$PARAMS" \
     --timeout-seconds 600 \
     --query Command.CommandId \
+    --region $REGION \
+    --profile $PROFILE \
     --output text 2>&1
-    --region $REGION
-    --profile $PROFILE
 )
 RES=$?
 
